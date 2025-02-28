@@ -10,23 +10,21 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 # Create Excel file if it doesn't exist
 def initialize_excel():
     if not os.path.exists(Config.EXCEL_FILE):
         df = pd.DataFrame(columns=[
-            'order_id', 'timestamp', 'customer_name', 'phone_number', 
+            'order_id', 'timestamp', 'customer_name', 'phone_number',
             'item', 'size', 'color', 'quantity', 'address', 'status'
         ])
         df.to_excel(Config.EXCEL_FILE, index=False)
         print(f"Created new Excel file: {Config.EXCEL_FILE}")
 
-
 def main() -> None:
     """Run the bot."""
     # Initialize Excel file
-    
     initialize_excel()
+    
     telegram_bot = TelegramBot()
     
     # Create the Application
@@ -34,7 +32,11 @@ def main() -> None:
     
     # Add conversation handler with states
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", telegram_bot.start)],
+        entry_points=[
+            CommandHandler("start", telegram_bot.start),
+            # Add message handler to catch 'hi' and other greetings
+            MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_bot.greet)
+        ],
         states={
             telegram_bot.NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_bot.name)],
             telegram_bot.PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_bot.phone)],
