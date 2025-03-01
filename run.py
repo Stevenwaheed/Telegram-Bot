@@ -38,6 +38,7 @@ def main() -> None:
             MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_bot.greet)
         ],
         states={
+            telegram_bot.LANGUAGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_bot.select_language)],
             telegram_bot.NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_bot.name)],
             telegram_bot.PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_bot.phone)],
             telegram_bot.ITEM: [MessageHandler(filters.TEXT & ~filters.COMMAND, telegram_bot.item)],

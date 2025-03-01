@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    container_name: store-telegram-bot
+    environment:
+      - YOUR_TELEGRAM_BOT_TOKEN=${YOUR_TELEGRAM_BOT_TOKEN}
+      - EXCEL_FILE=${EXCEL_FILE}
+      - SHOP_OWNER_TELEGRAM_ID=${SHOP_OWNER_TELEGRAM_ID}
+    volumes:
+      - .:/app
+    command: python run.py
