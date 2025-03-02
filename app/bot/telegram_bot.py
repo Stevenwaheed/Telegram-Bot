@@ -2,6 +2,8 @@ from datetime import datetime
 import os
 from venv import logger
 import pandas as pd
+from app.bot.methods import save_user_to_db
+from app.bot.models import UserType
 from app.config.config import Config
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ConversationHandler, ContextTypes
@@ -116,6 +118,25 @@ class TelegramBot:
     
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         """Start the conversation and prompt for language selection."""
+        
+        user = update.effective_user
+
+        # Extract user details
+        user_id = user.id
+        first_name = user.first_name
+        last_name = user.last_name
+        username = user.username
+        
+        welcome_message = (
+            f"Hello {first_name}!\n"
+            f"Your user ID is: {user_id}\n"
+            f"Username: @{username}\n"
+            f"Full name: {first_name} {last_name}"
+        )
+
+        print(welcome_message)
+        # logger.info(f"WLECOME MESSAGE: {welcome_message}")
+        
         # Initialize user data dictionary
         context.user_data['order'] = {}
         
@@ -124,7 +145,7 @@ class TelegramBot:
         
         # Offer language selection
         await update.message.reply_text(
-            "Please select your preferred language / Silakan pilih bahasa yang Anda inginkan:",
+            f"{welcome_message}, Please select your preferred language / Silakan pilih bahasa yang Anda inginkan:",
             reply_markup=ReplyKeyboardMarkup([
                 ["English 🇬🇧", "Bahasa Indonesia 🇮🇩"]
             ], one_time_keyboard=True)
@@ -192,6 +213,8 @@ class TelegramBot:
         
         # Store the validated phone number
         context.user_data['order']['phone'] = cleaned_number
+        new_user = save_user_to_db(context.user_data['order']['name'], cleaned_number, UserType.USER)
+        print(new_user)
         
         # Create a keyboard with available items in the correct language
         item_keyboard = []
